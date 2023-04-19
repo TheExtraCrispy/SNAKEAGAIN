@@ -91,20 +91,14 @@ class Grid:
                     self.points[y][x].SetType(PointType.EMPTY) #Set other points as empty
         headX = self.colNum//2
         headY = self.rowNum//2
-        self.PlaceSnake(3, [headX, headY], Direction.UP)
+        self.PlaceSnake(4, [headX, headY], Direction.UP)
         self.placeRandomFood()
 
-    def startLoopNoGUI(self, throttle=0):
-        steps = 0
+    def startLoopNoGUI(self):
         self.gameRunning = True
         while(self.gameRunning):
             self.gameLoop()
-            steps += 1
-            time.sleep(throttle)
-        print("Game over!")
-        print("Steps:", steps)
-        print("Score:", self.agent.fitness)
-        print("")
+        
         
     def GameOver(self):
         self.gameRunning = False

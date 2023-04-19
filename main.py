@@ -2,6 +2,8 @@ from Game.Grid import Grid
 from Game.GUI import GUI
 from Game.Point import PointType
 from Agent.Agents import *
+from Agent.Training import Population
+
 
 defaultParameters = {
       "ateFoodScore": 50,
@@ -44,5 +46,6 @@ def runGameNoGUI(agent):
 def QuickStart(agent):
     runGameGUI(agent)
 
-agent = HumanPlayer(defaultParameters)
-QuickStart(agent)
+
+pop = Population(conf)
+pop.test()

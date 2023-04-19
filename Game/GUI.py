@@ -17,6 +17,10 @@ class GUI:
         self.gameCanvas = None
         self.grid = grid
         
+    def startAILoop(self):
+        self.grid.gameRunning = True
+        self.setupWindow(self.grid.gameLoop)
+
 
     def startGameLoop(self):
         self.grid.gameRunning = True
@@ -69,7 +73,6 @@ class GUI:
             gameLoop()
         else:
             print("Game over!")
-            print("Score:", self.grid.agent.fitness)
             print("")
-            self.r.after(1000, self.r.destroy)
+            self.r.after(10, self.r.destroy)
         canvas.update()

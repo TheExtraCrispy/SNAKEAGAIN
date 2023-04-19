@@ -11,6 +11,14 @@ class Snake:
         self.heading = None
         self.head = None
         
+    def Look(self, direction):
+        lookedAt = self.grid.getAdjPoint(self.head, direction)
+        dist = 1
+        while(lookedAt.GetType() == PointType.EMPTY):
+            lookedAt = self.grid.getAdjPoint(lookedAt, direction)
+            dist += 1
+        return (lookedAt.GetType().value, dist)
+
 
     def BuildBody(self, position, heading):
         self.heading = heading
@@ -47,11 +55,12 @@ class Snake:
             self.body.appendleft(newPos)
             self.grid.placeRandomFood()
             self.head = newPos
-            return True
+            return 1
 
         #Snake has hit itself or a wall
         elif newPos.GetType()!=PointType.EMPTY:
             self.grid.GameOver()
+            return -1
         
         #Snake has moved into empty space
         else:
@@ -77,10 +86,15 @@ class Snake:
         return self.MoveForward()
 
     def MakeMove(self, choice):
-        if(choice == "left"):
+        if(choice == 0):
+            #print("LEFT")
             return self.TurnLeft()
-        if(choice=="straight"):
+        elif(choice==1):
+            #print("FORWARD")
             return self.MoveForward()
-        if(choice == "right"):
+        elif(choice == 2):
+            #print("RIGHT")
             return self.TurnRight()
-        
+        else:
+            print("INVALID MOVE")
+            raise RuntimeError
