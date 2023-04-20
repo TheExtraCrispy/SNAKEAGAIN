@@ -72,7 +72,7 @@ class AIAgent(Agent):
         def __init__(self, model):
             super().__init__()
             self.model = model
-            self.energyMax = 100
+            self.energyMax = 500
             self.energy = self.energyMax
 
         def setModel(self, model):
@@ -121,15 +121,16 @@ class AIAgent(Agent):
                 self.energy = self.energyMax
             #Moved towards or away from food
             elif(change>0):
-                self.movement += 1
+                self.movement += 1.0
             else:
-                self.movement += -1
+                self.movement += -1.5
 
             if(state==-1):
                 self.died = True
             self.steps += 1
             if(self.energy <= 0):
                 g.GameOver()
+                self.movement -= 50
                 self.died = True
 
 

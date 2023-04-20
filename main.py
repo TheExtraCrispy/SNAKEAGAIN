@@ -50,8 +50,17 @@ def RunAI(modelName):
     model = tensorflow.keras.models.load_model("Agent\\Models\\"+modelName)
     agent = AIAgent(model)
     runGameGUI(agent)
-
-pop = Population(conf)
-pop.run(20, 250, 5, "shortStart")
-
-#RunAI("johnSnake")
+def MakeModel(modelName, layers, populationSize, generations, parents):
+    pop = Population(conf)
+    pop.model = pop.buildModel(layers)
+    pop.run(populationSize, generations, parents, modelName)
+def TrainModel(modelName, populationSize, generations, parents):
+    model = tensorflow.keras.models.load_model("Agent\\Models\\"+modelName)
+    pop = Population(conf, model=model)
+    pop.run(populationSize, generations, parents, modelName)
+#pop = Population(conf)
+#pop.run(50, 500, 3, "longTrainLowElite")
+layers = [32, 32]
+#TrainModel("waltuh", 50, 500, 5)
+MakeModel("Waltuh", layers, 50, 2000, 5)
+#RunAI("Waltuh")

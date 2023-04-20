@@ -74,5 +74,5 @@ class GUI:
         else:
             print("Game over!")
             print("")
-            self.r.after(10, self.r.destroy)
+            self.r.after(1000, self.r.destroy)
         canvas.update()

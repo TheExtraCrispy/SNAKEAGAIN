@@ -8,7 +8,11 @@ import numpy as np
 class Population():
     def __init__(self, config, model=None):
         self.config = config
-        self.model = self.buildModel()
+        if(model != None):
+            print("loading model")
+        self.model = model
+        
+            
         self.agent = AIAgent(self.model)
         self.grid = Grid(config["gridHeight"],config["gridWidth"], self.agent)
         self.grid.Setup()
@@ -16,6 +20,7 @@ class Population():
     def run(self, populationSize, generations, parents, modelName):
         self.gencount = 0
         self.gentarget = generations
+        self.modelName = modelName
         modelGA = pygad.kerasga.KerasGA(model=self.model, num_solutions=populationSize)
         initialPopulation = modelGA.population_weights
 
@@ -23,13 +28,14 @@ class Population():
                       num_parents_mating=parents,
                       initial_population=initialPopulation,
                       fitness_func=self.fitness,
-                      on_generation=self.genCallback)
+                      on_generation=self.genCallback,
+                      parallel_processing=10)
         GA.run()
 
         solution = GA.best_solution()[0]
         bestWeights = pygad.kerasga.model_weights_as_matrix(model=self.model, weights_vector=solution)
 
-        GA.plot_fitness(title="OHMAN", linewidth=4)
+        GA.plot_fitness(title=modelName, linewidth=4)
         self.model.set_weights(bestWeights)
         self.saveModel("Agent\\Models\\"+modelName)
     
@@ -52,16 +58,18 @@ class Population():
         score += self.agent.movement
         score += self.agent.died*-50
 
-        print("Model", sol_idx, "Done!")
-        print("Fitness:", score)
-        print("Steps:", self.agent.steps)
-        print()
+        #print("Model", sol_idx, "Done!")
+        #print("Fitness:", score)
+        #print("Steps:", self.agent.steps)
+        #print()
         return score
 
     def genCallback(self, ga):
         self.gencount += 1
         print("Generation", self.gencount, "of", self.gentarget, "finished!")
         print()
+        if(self.gencount%50==0):
+            self.saveModel("Agent\\Models\\"+self.modelName)
 
     
         
@@ -70,11 +78,14 @@ class Population():
      #layers is a list of tuples, with an integer count and a string activation function
     #It does NOT include the input or output layers
     
-    def buildModel(self):
+    def buildModel(self, layers):
         model = tensorflow.keras.Sequential()
         #15
-        model.add(tensorflow.keras.layers.Dense(32, activation=tensorflow.nn.relu, input_shape=[15,]))
-        model.add(tensorflow.keras.layers.Dense(16, activation=tensorflow.nn.relu))
+        model.add(tensorflow.keras.layers.Dense(layers[0], activation=tensorflow.nn.relu, input_shape=[15,]))
+        for size in layers[1:]:
+            print("Adding layer with size", size)
+            model.add(tensorflow.keras.layers.Dense(size, activation=tensorflow.nn.relu))
+        
         model.add(tensorflow.keras.layers.Dense(3, activation=tensorflow.nn.softmax))
 
         #adam = tensorflow.keras.optimizers.Adam()
