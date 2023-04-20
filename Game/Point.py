@@ -1,11 +1,11 @@
 from enum import IntEnum
 class PointType(IntEnum):
-    EMPTY = 0
-    WALL = -30
-    FOOD = 10
+    EMPTY = 1
+    WALL =  -1
+    FOOD = 2
 
-    HEAD = -10
-    BODY = -20
+    HEAD = -2
+    BODY = -3
 
 class Point:
     def __init__(self, type, x, y):

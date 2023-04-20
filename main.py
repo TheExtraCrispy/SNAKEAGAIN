@@ -3,7 +3,7 @@ from Game.GUI import GUI
 from Game.Point import PointType
 from Agent.Agents import *
 from Agent.Training import Population
-
+import tensorflow
 
 defaultParameters = {
       "ateFoodScore": 50,
@@ -28,16 +28,16 @@ conf = {
 #    conf = json.load(configFile)
 
 def setupGrid(agent):
-        cols = conf["gridHeight"]
-        rows = conf["gridWidth"]
-        grid = Grid(cols, rows, agent)
-        grid.Setup()
-        return grid
+    cols = conf["gridHeight"]
+    rows = conf["gridWidth"]
+    grid = Grid(cols, rows, agent)
+    grid.Setup()
+    return grid
 
 def runGameGUI(agent):
-      grid = setupGrid(agent)
-      gui = GUI(conf, grid)
-      gui.startGameLoop()
+    grid = setupGrid(agent)
+    gui = GUI(conf, grid)
+    gui.startGameLoop()
 
 def runGameNoGUI(agent):
     grid = setupGrid(agent)
@@ -46,6 +46,12 @@ def runGameNoGUI(agent):
 def QuickStart(agent):
     runGameGUI(agent)
 
+def RunAI(modelName):
+    model = tensorflow.keras.models.load_model("Agent\\Models\\"+modelName)
+    agent = AIAgent(model)
+    runGameGUI(agent)
 
 pop = Population(conf)
-pop.test()
+pop.run(20, 250, 5, "shortStart")
+
+#RunAI("johnSnake")

@@ -91,7 +91,7 @@ class Grid:
                     self.points[y][x].SetType(PointType.EMPTY) #Set other points as empty
         headX = self.colNum//2
         headY = self.rowNum//2
-        self.PlaceSnake(4, [headX, headY], Direction.UP)
+        self.PlaceSnake(3, [headX, headY], Direction.UP)
         self.placeRandomFood()
 
     def startLoopNoGUI(self):
@@ -99,7 +99,21 @@ class Grid:
         while(self.gameRunning):
             self.gameLoop()
         
+    def reset(self):
+        if(self.snake != None):
+            while(self.snake.body):
+                point = self.snake.body.pop()
+                point.SetType(PointType.EMPTY)
+        if(self.food != None):
+            self.food.SetType(PointType.EMPTY)
+        self.snake = None
+        self.food = None
         
+        headX = self.colNum//2
+        headY = self.rowNum//2
+        self.PlaceSnake(3, [headX, headY], Direction.UP)
+        self.placeRandomFood()
+
     def GameOver(self):
         self.gameRunning = False
         #Probably do other stuff later too

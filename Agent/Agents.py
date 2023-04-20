@@ -72,7 +72,7 @@ class AIAgent(Agent):
         def __init__(self, model):
             super().__init__()
             self.model = model
-            self.energyMax = 200
+            self.energyMax = 100
             self.energy = self.energyMax
 
         def setModel(self, model):
@@ -135,7 +135,7 @@ class AIAgent(Agent):
 
         def ChooseMove(self, input):
             input = tensorflow.expand_dims(input, axis=0)
-            choices = self.model.predict(input, verbose=0)
+            choices = self.model(input)
             bestChoice = np.argmax(choices)
             return bestChoice
 
