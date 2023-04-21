@@ -73,7 +73,7 @@ class Snake:
             newPos.SetType(PointType.HEAD)
             self.body.appendleft(newPos)
             self.head = newPos
-            return False
+            return 0
             
         
 

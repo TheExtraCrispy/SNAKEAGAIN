@@ -5,6 +5,8 @@ from Agent.Agents import *
 from Agent.Training import Population
 import tensorflow
 
+tensorflow.compat.v1.logging.set_verbosity(tensorflow.compat.v1.logging.ERROR)
+
 defaultParameters = {
       "ateFoodScore": 50,
       "towardsFoodScore": 2,
@@ -12,8 +14,8 @@ defaultParameters = {
 }
 
 conf = {
-    "gridHeight": 40,
-    "gridWidth": 40,
+    "gridHeight": 30,
+    "gridWidth": 30,
     "canvasSize": 800,
     "updateRate": 100,
     "colorPalette": {
@@ -52,15 +54,26 @@ def RunAI(modelName):
     runGameGUI(agent)
 def MakeModel(modelName, layers, populationSize, generations, parents):
     pop = Population(conf)
-    pop.model = pop.buildModel(layers)
+    pop.buildModel(layers, modelName)
     pop.run(populationSize, generations, parents, modelName)
+
 def TrainModel(modelName, populationSize, generations, parents):
-    model = tensorflow.keras.models.load_model("Agent\\Models\\"+modelName)
-    pop = Population(conf, model=model)
+    pop = Population(conf, modelName=modelName)
     pop.run(populationSize, generations, parents, modelName)
-#pop = Population(conf)
-#pop.run(50, 500, 3, "longTrainLowElite")
-layers = [32, 32]
-#TrainModel("waltuh", 50, 500, 5)
-MakeModel("Waltuh", layers, 50, 2000, 5)
+
+
+
+#--------------FOR DEMO-----------------
+
+#Make New
+#layers = [24, 12]
+#MakeModel("NewModel", layers, 20, 5, 2)
+
+#Run AI
 #RunAI("Waltuh")
+
+#Quick train
+#TrainModel("test", 10, 5, 2)
+
+#Long Train
+TrainModel("Waltuh", 200, 2500, 20)

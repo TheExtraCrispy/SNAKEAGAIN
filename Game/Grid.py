@@ -2,6 +2,7 @@ from Game.Point import Point,PointType
 import random
 import time
 from enum import Enum
+import numpy as np
 
 class Direction(Enum):
     UP = 1
@@ -98,7 +99,16 @@ class Grid:
         self.gameRunning = True
         while(self.gameRunning):
             self.gameLoop()
-        
+    
+    def getPointType(self, point):
+        return point.GetType().value
+    
+    def flattenGrid(self):
+        flat = np.array(self.points)
+        flat = flat.flatten()
+        out = np.vectorize(self.getPointType)(flat)
+        return out
+
     def reset(self):
         if(self.snake != None):
             while(self.snake.body):
@@ -117,7 +127,6 @@ class Grid:
     def GameOver(self):
         self.gameRunning = False
         #Probably do other stuff later too
-
 
     def gameLoop(self):
         self.agent.MakeMove(self)
@@ -144,6 +153,37 @@ class Grid:
                     freePoints.append(point)
         return freePoints
     
+    def getState(self):
+        snake = self.snake
+        food = self.food
+        heading = snake.heading
+        headPos = snake.head.GetPosition()
+        
+        foodPos = food.GetPosition()
+
+        lookLeft = snake.Look(Direction.rotateCCW(heading))
+        lookForward = snake.Look(heading)
+        lookRight = snake.Look(Direction.rotateCW(heading))
+
+        state = np.asarray([headPos[0],
+                            headPos[1],
+                            heading.value,
+
+                            lookLeft[0],
+                            lookLeft[1],
+                            lookForward[0],
+                            lookForward[1],
+                            lookRight[0],
+                            lookRight[1],
+
+                            snake.bodySize,
+                            foodPos[0],
+                            foodPos[1],
+                            self.GetDistance(snake.head, food)
+                            ], dtype=np.float32)
+
+        return state
+
     #manhattan distance between 2 points
     def GetDistance(self, point1, point2):
         x1 = point1.x

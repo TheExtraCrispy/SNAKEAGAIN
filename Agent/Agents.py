@@ -79,35 +79,13 @@ class AIAgent(Agent):
             self.model = model
             self.energy = self.energyMax
 
-        def getInput(self, g):
-            input = []
-            
-            heading = g.snake.heading
-            #Gets the current position and direction of it's head
-            input += g.snake.head.GetPosition()
-            input += [heading.value]
-
-            #Looks at what points are left, forward, and right, and how far away they are
-            input += g.snake.Look(Direction.rotateCW(heading))
-            input += g.snake.Look(heading)
-            input += g.snake.Look(Direction.rotateCCW(heading))
-
-            #Gets the size of the snake and the size of the board
-            input += [g.snake.bodySize]
-            input += [g.colNum]
-            input += [g.rowNum]
-
-            #Gets the position and manhattan distance from head to food
-            input += g.food.GetPosition()
-            input += [g.GetDistance(g.snake.head, g.food)]
-            
-            return np.array(input, dtype=np.float32)
+        
             
 
         def MakeMove(self, g):
             distToFood = g.GetDistance(g.snake.head, g.food)
 
-            input = self.getInput(g)
+            input = g.getState()
             move = self.ChooseMove(input)
             state = g.snake.MakeMove(move)
 
@@ -123,7 +101,7 @@ class AIAgent(Agent):
             elif(change>0):
                 self.movement += 1.0
             else:
-                self.movement += -1.5
+                self.movement -= 1.5
 
             if(state==-1):
                 self.died = True
