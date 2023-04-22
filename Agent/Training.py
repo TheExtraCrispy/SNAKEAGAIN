@@ -22,7 +22,9 @@ class Population():
         self.grids = []
         self.agents = []
         self.models = []
-        
+        self.avgFit = []
+        self.peakFit = []
+
         print("Setting up evo run...")
         for i in range(0, populationSize+1):
             model = tensorflow.keras.models.load_model("Agent\\Models\\"+modelName)
@@ -46,11 +48,16 @@ class Population():
                       initial_population=initialPopulation,
                       fitness_func=self.fitness,
                       on_generation=self.genCallback,
-                      parallel_processing=5,
+                      parallel_processing=12,
                       parent_selection_type="rws",
                       keep_elitism=populationSize//2
                       )
         GA.run()
+
+
+        #saving stats
+        np.savetxt("avg.csv", self.avgFit, delimiter=", ")
+        np.savetxt("peak.csv", self.peakFit, delimiter=", ")
 
         solution = GA.best_solution()[0]
         solIdx = GA.best_solution()[2]
@@ -59,7 +66,6 @@ class Population():
         bestModel.set_weights(bestWeights)
 
         bestModel.save("Agent\\Models\\"+modelName)
-        GA.plot_fitness(title=modelName, linewidth=4)
         print("Best Model: Model", solIdx, "Fitness:", GA.best_solution()[1]-250)
    
     def fitness(self, inst, solution, sol_idx):
@@ -92,11 +98,19 @@ class Population():
     def genCallback(self, ga):
         self.gencount += 1
         fit = ga.last_generation_fitness
+        avg = np.average(fit)-250
+        peak = np.max(fit)-250
+        
+        self.peakFit.append(peak)
+        self.avgFit.append(avg)
+
         print("Generation", self.gencount, "of", self.gentarget, "finished!")
-        print("Average Fitness: ", np.average(fit)-250)
-        print("Peak Fitness:", np.max(fit)-250, "\n")
+        print("Average Fitness: ", avg)
+        print("Peak Fitness:", peak, "\n")
         if(self.gencount%50==0):
             print("Saving progress...")
+            np.savetxt("avg.csv", self.avgFit, delimiter=", ")
+            np.savetxt("peak.csv", self.peakFit, delimiter=", ")
             model = self.models[np.argmax(fit)]
             model.save("Agent\\Models\\"+self.modelName)
 
@@ -111,13 +125,13 @@ class Population():
         self.modelName = modelName
         model = tensorflow.keras.Sequential()
         #15
-        model.add(tensorflow.keras.layers.Dense(layers[0], activation=tensorflow.nn.relu, input_shape=[13,]))
+        model.add(tensorflow.keras.layers.Dense(layers[0], activation=tensorflow.keras.activations.relu, input_shape=[13,]))
         for size in layers[1:]:
             print("Adding layer with size", size)
-            model.add(tensorflow.keras.layers.Dense(size, activation=tensorflow.nn.relu))
+            model.add(tensorflow.keras.layers.Dense(size, activation=tensorflow.keras.activations.relu))
         
-        model.add(tensorflow.keras.layers.Dense(3, activation=tensorflow.nn.softmax))
-
+        model.add(tensorflow.keras.layers.Dense(3, activation=tensorflow.keras.activations.softmax))
+        
         #adam = tensorflow.keras.optimizers.Adam()
         #model.compile(loss='mse', optimizer=adam)
         #if(weights):

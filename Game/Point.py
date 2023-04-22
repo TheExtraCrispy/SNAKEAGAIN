@@ -1,9 +1,9 @@
 from enum import IntEnum
 class PointType(IntEnum):
     EMPTY = 1
-    WALL =  -1
     FOOD = 2
-
+    
+    WALL =  -1
     HEAD = -2
     BODY = -3
 

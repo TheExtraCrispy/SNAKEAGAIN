@@ -13,18 +13,14 @@ class Agent():
         self.foodEaten = 0
         self.died = False
     
-
+    #Resets this agent
     def reset(self):
         self.steps = 0
         self.movement = 0.0
         self.foodEaten = 0
         self.died = False
-    #Chooses the best of 3 moves, represented as floats of probability that that move is best. 
-    #eg:(0.5, 0.4, 0.1) ordered as Left, Straight, Right
     
-    #using softmax maybe?
-
-    #Choose move, make move, evaluate score of move.
+    #Chooses a move, makes that move, updates personal stats accordingly.
     def MakeMove(self, g):
         distToFood = g.GetDistance(g.snake.head, g.food)        
         move = self.ChooseMove()
@@ -50,7 +46,7 @@ class Agent():
 
 
     def ChooseMove(self):
-        #Implemented by agent
+        #Implemented by specific agent
         raise NotImplementedError
 
 class RandomAgent(Agent):
@@ -72,19 +68,21 @@ class AIAgent(Agent):
         def __init__(self, model):
             super().__init__()
             self.model = model
-            self.energyMax = 500
+            self.energyMax = 300 #How long can go without food before dying, prevents infinite loops or extremely slow paths
             self.energy = self.energyMax
 
-        def setModel(self, model):
-            self.model = model
-            self.energy = self.energyMax
 
-        
+        def reset(self):
+            self.steps = 0
+            self.movement = 0.0
+            self.foodEaten = 0
+            self.died = False
+            self.energy = self.energyMax
             
-
         def MakeMove(self, g):
             distToFood = g.GetDistance(g.snake.head, g.food)
 
+            #Gets input from grid state, and passes it to the model
             input = g.getState()
             move = self.ChooseMove(input)
             state = g.snake.MakeMove(move)
@@ -112,7 +110,9 @@ class AIAgent(Agent):
                 self.died = True
 
 
+        #Model uses input to choose 3 moves, left forward or right.
         def ChooseMove(self, input):
+            #input = tensorflow.cast(input, float)
             input = tensorflow.expand_dims(input, axis=0)
             choices = self.model(input)
             bestChoice = np.argmax(choices)

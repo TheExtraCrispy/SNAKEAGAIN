@@ -3,29 +3,19 @@ from tkinter import ttk
 from Game.Grid import Grid
 from Game.Point import PointType
 
-class MainMenu:
-    def __init__(self) -> None:
-        print("TODO")
-    
-    def startup(self):
-        self.r = tk.Tk()
-
 class GUI:
     def __init__(self, config, grid):
         self.conf = config
         self.grid = None
         self.gameCanvas = None
         self.grid = grid
-        
-    def startAILoop(self):
-        self.grid.gameRunning = True
-        self.setupWindow(self.grid.gameLoop)
-
-
+    
+    #Starts a game loop, and displays the game in a window.
     def startGameLoop(self):
         self.grid.gameRunning = True
         self.setupWindow(self.grid.gameLoop)    
         
+    #Setting up window
     def setupWindow(self, gameLoop):
         self.r = tk.Tk()
         r = self.r
@@ -47,14 +37,19 @@ class GUI:
         self.drawGame(gameLoop)
         r.mainloop()
     
+
+    #Gets the corresponding color of a point
     def pickColor(self, type):
         return self.conf["colorPalette"][type]
 
-    
-
+    #Draws the current state of the game, then calls for it to be updated by the agent
+    #Loops until game is over.
     def drawGame(self, gameLoop):
         canvas = self.gameCanvas
+        #Clear previous board
         canvas.delete(tk.ALL)
+        
+        #Draw each point as a pixel, with color according to its type
         for x in range(self.grid.colNum):
             for y in range(self.grid.rowNum):
                 x1 = x*self.pixelSize
@@ -64,10 +59,10 @@ class GUI:
                 y2 = y1+self.pixelSize
 
                 pointType = self.grid.getPoint(x, y).GetType()
-                if(pointType != PointType.EMPTY):
+                if(pointType != PointType.EMPTY): #Don't draw empty spaces, saves performance on large grids
                     canvas.create_rectangle(x1, y1, x2, y2, fill=self.pickColor(pointType))
         
-        
+        #Loop while game is ongoing
         if(self.grid.gameRunning):
             canvas.after(self.conf["updateRate"], self.drawGame, gameLoop)
             gameLoop()
