@@ -86,11 +86,11 @@ def plotStats():
 
 
 #Make New
-layers = [10, 10]
-MakeModel("JohnSnake", layers, 200, 1000, 2)
+#layers = [10, 10]
+#MakeModel("TrueJohnSnake", layers, 200, 10000, 2) 
 
 #Run AI
-#RunAI("Waltuh2")
+RunAI("TrueJohnSnake")
 
 #Quick train (for demo)
 #TrainModel("Waltuh2", 10, 5, 2)
@@ -99,4 +99,4 @@ MakeModel("JohnSnake", layers, 200, 1000, 2)
 #TrainModel("Waltuh2", 500, 1000, 2)
 
 
-plotStats()
+#plotStats()
