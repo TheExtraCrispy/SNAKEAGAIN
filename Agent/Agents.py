@@ -1,9 +1,7 @@
 import random
-import keyboard
-import time
 import tensorflow
 import numpy as np
-from Game.Grid import Direction
+#import keyboard    used for human player, unused in final setup
 
 
 class Agent():
@@ -54,14 +52,15 @@ class RandomAgent(Agent):
         picked = random.randint(0,2)
         return picked 
 
-class HumanPlayer(Agent): #Controls are inverted because i flipped something somewhere, it works though
-    def ChooseMove(self):
-        if keyboard.is_pressed("left"):
-           return 2
-        elif keyboard.is_pressed("right"):
-            return 0
-        else:
-            return 1
+# Used to play manually, not used in final setup. requires keyboard module
+#class HumanPlayer(Agent): 
+#    def ChooseMove(self):
+#        if keyboard.is_pressed("left"):
+#           return 2
+#        elif keyboard.is_pressed("right"):
+#            return 0
+#        else:
+#            return 1
         
 
 class AIAgent(Agent):

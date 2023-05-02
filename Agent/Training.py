@@ -4,19 +4,14 @@ from Game.GUI import GUI
 import tensorflow
 import pygad.kerasga
 import numpy as np
+import os
 
 class Population():
     def __init__(self, config, modelName=None):
-        print("Setting up population...")
         tensorflow.compat.v1.logging.set_verbosity(tensorflow.compat.v1.logging.ERROR)
-        self.config = config
-        
+        self.config = config        
         self.modelName = modelName
-        print("Done.")
             
-        #self.agent = AIAgent(self.model)
-        #self.grid = Grid(config["gridHeight"],config["gridWidth"], self.agent)
-        #self.grid.Setup()        
 
     def run(self, populationSize, generations, parents, modelName):
         self.grids = []
@@ -25,9 +20,9 @@ class Population():
         self.avgFit = []
         self.peakFit = []
 
-        print("Setting up evo run...")
+        print("Setting up...")
         for i in range(0, populationSize+1):
-            model = tensorflow.keras.models.load_model("Agent\\Models\\"+modelName)
+            model = tensorflow.keras.models.load_model("Agent/Models/"+modelName)
                 
             agent = AIAgent(model)
             grid = Grid(self.config["gridHeight"],self.config["gridWidth"], agent)
@@ -36,7 +31,7 @@ class Population():
             self.agents.append(agent)
             self.models.append(model)
         print("Done.")
-        print("Starting evo run.\n")
+        print("Starting.\n")
         self.gencount = 0
         self.gentarget = generations
         self.modelName = modelName
@@ -56,8 +51,11 @@ class Population():
 
 
         #saving stats
-        np.savetxt("avg.csv", self.avgFit, delimiter=", ")
-        np.savetxt("peak.csv", self.peakFit, delimiter=", ")
+        path = 'statbackup/'+self.modelName
+        if not os.path.exists(path):
+            os.makedirs(path)
+        np.savetxt(path + "/avg.csv", self.avgFit, delimiter=", ")
+        np.savetxt(path + "/peak.csv", self.peakFit, delimiter=", ")
 
         solution = GA.best_solution()[0]
         solIdx = GA.best_solution()[2]
@@ -65,7 +63,7 @@ class Population():
         bestWeights = pygad.kerasga.model_weights_as_matrix(model=bestModel, weights_vector=solution)
         bestModel.set_weights(bestWeights)
 
-        bestModel.save("Agent\\Models\\"+modelName)
+        bestModel.save("Agent/Models/"+modelName)
         print("Best Model: Model", solIdx, "Fitness:", GA.best_solution()[1]-250)
    
     def fitness(self, inst, solution, sol_idx):
@@ -109,10 +107,14 @@ class Population():
         print("Peak Fitness:", peak, "\n")
         if(self.gencount%50==0):
             print("Saving progress...")
-            np.savetxt("avg.csv", self.avgFit, delimiter=", ")
-            np.savetxt("peak.csv", self.peakFit, delimiter=", ")
+            path = 'statbackup/'+self.modelName
+            if not os.path.exists(path):
+                os.makedirs(path)
+            np.savetxt(path + "/avg.csv", self.avgFit, delimiter=", ")
+            np.savetxt(path + "/peak.csv", self.peakFit, delimiter=", ")
+            
             model = self.models[np.argmax(fit)]
-            model.save("Agent\\Models\\"+self.modelName)
+            model.save("Agent/Models/"+self.modelName)
 
     
         
@@ -127,7 +129,6 @@ class Population():
         #15
         model.add(tensorflow.keras.layers.Dense(layers[0], activation=tensorflow.keras.activations.relu, input_shape=[13,]))
         for size in layers[1:]:
-            print("Adding layer with size", size)
             model.add(tensorflow.keras.layers.Dense(size, activation=tensorflow.keras.activations.relu))
         
         model.add(tensorflow.keras.layers.Dense(3, activation=tensorflow.keras.activations.softmax))
@@ -136,7 +137,7 @@ class Population():
         #model.compile(loss='mse', optimizer=adam)
         #if(weights):
         #    model.load_weights(weights)
-        model.save("Agent\\Models\\"+self.modelName)
+        model.save("Agent/Models/"+self.modelName)
         return model
     
     def saveModel(self, path):
